@@ -1,14 +1,54 @@
-#!/usr/bin/env python
-# coding: utf-8
+"""
+Boulder County Meeting Scraper
+-----------------------------
 
-# In[ ]:
+A Python script to scrape meeting information from Boulder County's eScribe platform.
 
+Requirements:
+------------
+1. Python 3.x
+2. Chrome or Chromium browser installed
+3. Required packages (install via pip):
+    pip install selenium pandas webdriver-manager
 
-get_ipython().system('pip install webdriver-manager')
+Platform Notes:
+--------------
+- Developed and tested on macOS
+- Windows users may need to:
+    - Use 'pip3' instead of 'pip'
+    - Update PATH environment variables for Chrome
+    - Use different file paths (will be handled automatically)
+- Linux users: not currently tested, but should work with Chrome/Chromium
 
+Installation:
+------------
+1. Ensure Chrome/Chromium is installed
+2. Install requirements: pip install -r requirements.txt
+3. Make sure you have write permissions in output directory
 
-# In[ ]:
+Output:
+-------
+- Creates CSV file in user's home directory
+- Captures meeting titles, dates, locations, and agenda links
+- Includes both HTML and PDF agenda links when available
 
+Author: FlyingCloudHealth
+License: MIT
+"""
+
+# Imports
+import pandas as pd
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+from datetime import datetime
+import os
+import csv
+import time
 
 def bouldercounty_scraper():
     """Scrape Boulder County meeting information from eScribe platform."""
@@ -52,9 +92,9 @@ def bouldercounty_scraper():
                     
                     for meeting in meetings:
                         try:
-                            # Extract meeting details using relative selectors
+                            # Extract meeting details
                             title = meeting.find_element(By.CSS_SELECTOR, "div:nth-child(2) > div:nth-child(1) > h3 > a").text
-                            title = title.split("Thursday")[0].strip()  # Clean up title
+                            title = title.split("Thursday")[0].strip()
                             
                             date_time = meeting.find_element(By.CSS_SELECTOR, "div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)").text
                             location = meeting.find_element(By.CSS_SELECTOR, "div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)").text
@@ -134,10 +174,10 @@ def bouldercounty_scraper():
             return True
         return False
 
-
-# In[ ]:
-
-
-#run the scraper
-success = bouldercounty_scraper()
-
+if __name__ == "__main__":
+    # Set up file path
+    home_dir = os.path.expanduser("~")
+    filename = os.path.join(home_dir, "boulder_meetings.csv")
+    
+    # Run the scraper
+    success = bouldercounty_scraper()
